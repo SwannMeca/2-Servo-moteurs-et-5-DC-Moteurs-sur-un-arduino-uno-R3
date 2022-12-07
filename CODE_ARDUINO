@@ -1,0 +1,191 @@
+ #include <IRremote.h>
+#include <Servo.h>
+
+Servo monServoBase;
+Servo monServoBras;
+int positionDuServoBase = 90;
+int positionDuServoBras= 0;
+// C++ code
+//
+
+
+IRrecv receiver(A5); // create a receiver object of the IRrecv class
+decode_results results; // create a results object of the decode_results class
+int in1 = 2;
+int in2 = 3;
+int in3 = 4;
+int in4 = 5;
+int in5 = 6;
+int in6 = 7;
+int in7 = 8;
+int in8 = 9;
+
+
+void setup()
+{
+  Serial.begin(9600); // begin serial communication with a baud rate of 9600
+  receiver.enableIRIn(); // enable the receiver
+  receiver.blink13(true); // enable blinking of the built-in LED when an IR signal is received
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+  pinMode(in5, OUTPUT);
+  pinMode(in6, OUTPUT);
+  pinMode(in7, OUTPUT);
+  pinMode(in8, OUTPUT);
+digitalWrite(in1, 0);
+digitalWrite(in2, 0);
+digitalWrite(in3, 0);
+digitalWrite(in4, 0);
+digitalWrite(in5, 0);
+digitalWrite(in6, 0);
+digitalWrite(in7, 0);
+digitalWrite(in8, 0);
+  monServoBase.attach(11);
+  monServoBras.attach(10);
+  monServoBase.write(positionDuServoBase); 
+monServoBras.write(positionDuServoBras); 
+
+}
+
+void loop()
+{
+if (receiver.decode(&results)) { // decode the received signal and store it in results
+ Serial.println(results.value, HEX);
+ if (results.value==0xFF18E7){ // FLECHE HAUT == AVANCER
+  digitalWrite(in1, 0);
+  digitalWrite(in2, 1);
+  digitalWrite(in3, 1);
+  digitalWrite(in4, 0);
+  digitalWrite(in5, 1);
+  digitalWrite(in6, 0);
+  digitalWrite(in7, 0);
+  digitalWrite(in8, 1);
+
+ }
+ if (results.value==0xFF4AB5){ // FLECHE BAS = RECULER
+  digitalWrite(in1, 1);
+  digitalWrite(in2, 0);
+  digitalWrite(in3, 0);
+  digitalWrite(in4, 1);
+  digitalWrite(in5, 0);
+  digitalWrite(in6, 1);
+  digitalWrite(in7, 1);
+  digitalWrite(in8, 0);
+
+ }
+ if (results.value==0xFF38C7){ // OK == ARRÊT
+  digitalWrite(in1, 0);
+  digitalWrite(in2, 0);
+  digitalWrite(in3, 0);
+  digitalWrite(in4, 0);
+  digitalWrite(in5, 0);
+  digitalWrite(in6, 0);
+  digitalWrite(in7, 0);
+  digitalWrite(in8, 0);
+ }
+  if (results.value==0xFF10EF){ //tourner gauche
+digitalWrite(in1, 1);
+digitalWrite(in2, 0);
+digitalWrite(in3, 1);
+digitalWrite(in4, 0);
+digitalWrite(in5, 1);
+digitalWrite(in6, 0);
+digitalWrite(in7, 1);
+digitalWrite(in8, 0);
+delay(200);
+  digitalWrite(in1, 0);
+  digitalWrite(in2, 0);
+  digitalWrite(in3, 0);
+  digitalWrite(in4, 0);
+  digitalWrite(in5, 0);
+  digitalWrite(in6, 0);
+  digitalWrite(in7, 0);
+  digitalWrite(in8, 0);
+  }
+if (results.value==0xFF5AA5){ //tourner droite
+  digitalWrite(in1, 0);
+digitalWrite(in2, 1);
+digitalWrite(in3, 0);
+digitalWrite(in4, 1);
+digitalWrite(in5, 0);
+digitalWrite(in6, 1);
+digitalWrite(in7, 0);
+digitalWrite(in8, 1);
+delay(200);
+  digitalWrite(in1, 0);
+  digitalWrite(in2, 0);
+  digitalWrite(in3, 0);
+  digitalWrite(in4, 0);
+  digitalWrite(in5, 0);
+  digitalWrite(in6, 0);
+  digitalWrite(in7, 0);
+  digitalWrite(in8, 0);
+}
+
+
+
+if (results.value==0xFFA25D){ // Bouton 1. avancer servo moteur à la base
+  if  (positionDuServoBase <141){
+     positionDuServoBase =  positionDuServoBase +4;
+     monServoBase.write(positionDuServoBase);
+    Serial.println(positionDuServoBase);
+  }
+  }
+
+
+
+if (results.value==0xFF629D){ // Bouton 2. reculer servo moteur à la base
+  if (positionDuServoBase>5){
+    positionDuServoBase =  positionDuServoBase -4;
+    monServoBase.write(positionDuServoBase);
+    Serial.println(positionDuServoBase);
+  }
+}
+
+if (results.value==0xFFE21D){ // Bouton 3. avancer 2nd servo moteur au bras
+  if  (positionDuServoBras <174){
+     positionDuServoBras =  positionDuServoBras +8;
+     monServoBras.write(positionDuServoBras);
+    Serial.println(positionDuServoBras);
+  }
+  }
+
+if (results.value==0xFF22DD){ // Bouton 4. reculer 2nd servo moteur au bras
+  if (positionDuServoBras>9){
+    positionDuServoBras =  positionDuServoBras -8;
+    monServoBras.write(positionDuServoBras);
+    Serial.println(positionDuServoBras);
+  }
+}
+
+
+
+  // print the values in the Serial Monitor
+ receiver.resume(); // reset the receiver for the next code
+}
+delay(50);
+}
+
+
+
+//FONCTION DÉCODAGE DES BOUTONS : 
+//1 : FFA25D
+//2 : FF629D
+//3 : FFE21D
+//4 : FF22DD
+//5 : FF02FD
+//6 : FFC23D
+//7 :FFE01F
+//8 : FFA857
+//9 : FF906F
+//0 : FF9867
+//* : FF6897
+//# : FFB04F
+//< : FF10EF
+//FLECHE HAUT : FF18E7
+//> : FF5AA5
+//FLECHE BAS : FF4AB5 
+//OK : FF38C7
+
